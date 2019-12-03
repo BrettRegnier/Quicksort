@@ -28,7 +28,7 @@ double StartStackQuickSort2_0(int iter, int size, int threads);
 template <typename T>
 void StackQuickSort2_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads);
 
-double StartNestedOMPSort2_0(int iter, int size, int threads);
+double StartNestedOMPSort1_0(int iter, int size, int threads);
 template <typename T>
 void NestedOMPSort1_0(std::vector<T> &vec, int l, int r, int &busythreads, int &threads);
 
@@ -36,17 +36,33 @@ double StartTaskQueueSort1_0(int iter, int size, int threads);
 template <typename T>
 void TaskQueueSort1_0(std::vector<T> &vec, int l, int r);
 
+double StartPThreadsSort(int iter, int size, int threads);
+void *PThreadsRunner(void *param);
+template <typename T>
+void PThreadsSort(std::vector<T> &vec, int l, int r, int &activeThreads, int maxThreads);
+// void PThreadsSort(std::vector<T> &vec, int l, int r, int &busythreads, int &threads);
+
 template <typename T>
 bool Validate(std::vector<T> &vec);
 template <typename T>
 void PrintResults(std::vector<T> &vec);
+
+template <typename T>
+struct pThreadObj
+{
+    std::vector<T> &vec;
+    int l;
+    int r;
+    int &activeThreads;
+    int maxThreads;
+};
 
 int main()
 {
     std::cout << "threads available = " << omp_get_max_threads() << std::endl;
 
     double t;
-    int s = 10000000;
+    int s = 100000000;
 
     // t = StartSerialQuickSort1_5(3, s);
     // std::cout << "Elapsed Serial Quicksort v1.5 = " << t << std::endl;
@@ -54,17 +70,20 @@ int main()
     // t = StartSerialQuickSort1_6(3, s);
     // std::cout << "Elapsed Serial Quicksort v1.6 = " << t << std::endl;
 
-    t = StartStackQuickSort1_0(3, s, 4);
-    std::cout << "Elapsed Stack Quicksort v1.0 = " << t << std::endl;
+    // t = StartStackQuickSort1_0(3, s, 4);
+    // std::cout << "Elapsed Stack Quicksort v1.0 = " << t << std::endl;
 
-    t = StartStackQuickSort2_0(3, s, 4);
-    std::cout << "Elapsed Stack Quicksort v2.0 = " << t << std::endl;
+    // t = StartStackQuickSort2_0(3, s, 4);
+    // std::cout << "Elapsed Stack Quicksort v2.0 = " << t << std::endl;
 
     // t = StartNestedOMPSort1_0(3, s, 4);
     // std::cout << "Elapsed nested omp sort 1.0 = " << t << std::endl;
 
     // t = StartTaskQueueSort1_0(3, s, 4);
     // std::cout << "Elapsed nested omp sort 1.0 = " << t << std::endl;
+
+    t = StartPThreadsSort(3, s, 4);
+    std::cout << "Elapsed nested omp sort 1.0 = " << t << std::endl;
 }
 
 template <typename T>
@@ -293,7 +312,6 @@ void StackQuickSort1_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<i
 
         while (true)
         {
-            // std::cout << "here1" << std::endl;
             while (vec[++i] < pivot)
                 ;
             while (vec[--j] > pivot)
@@ -425,7 +443,6 @@ void StackQuickSort2_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<i
 
         while (true)
         {
-            // std::cout << "here1" << std::endl;
             while (vec[++i] < pivot)
                 ;
             while (vec[--j] > pivot)
@@ -503,7 +520,6 @@ void NestedOMPSort1_0(std::vector<T> &vec, int l, int r, int &busythreads, int &
 
     while (true)
     {
-        // std::cout << "here1" << std::endl;
         while (vec[++i] < pivot)
             ;
         while (vec[--j] > pivot)
@@ -600,7 +616,6 @@ void TaskQueueSort1_0(std::vector<T> &vec, int l, int r)
 
     while (true)
     {
-        // std::cout << "here1" << std::endl;
         while (vec[++i] < pivot)
             ;
         while (vec[--j] > pivot)
@@ -623,6 +638,142 @@ void TaskQueueSort1_0(std::vector<T> &vec, int l, int r)
     {
         TaskQueueSort1_0(vec, i + 1, r);
     }
+}
+
+double StartPThreadsSort(int iter, int size, int threads)
+{
+    double elapsed = 0.0f;
+    double start = 0.0f;
+    double stop = 0.0f;
+    std::vector<int> vec;
+    for (int i = 0; i < iter; i++)
+    {
+        int activeThreads = 1;
+        vec.clear();
+        for (int i = 0; i < size; i++)
+            vec.push_back(rand());
+
+        start = omp_get_wtime();
+
+        PThreadsSort(vec, 0, vec.size() - 1, activeThreads, threads);
+        
+        stop = omp_get_wtime();
+        elapsed += (stop - start);
+    }
+
+    Validate(vec);
+
+    return elapsed / iter;
+}
+
+void *PThreadsRunner(void *param)
+{
+    struct pThreadObj<int> p = *(static_cast<pThreadObj<int> *>(param));
+    p.activeThreads++;
+
+    PThreadsSort(p.vec, p.l, p.r, p.activeThreads, p.maxThreads);
+    return NULL;
+}
+
+template <typename T>
+void PThreadsSort(std::vector<T> &vec, int l, int r, int &activeThreads, int const maxThreads)
+{
+    T pivot;
+    T tmp;
+    int i, j;
+
+    if (r - l < INSERT_THRESH)
+    {
+        SerialInsertionSort(vec, l, r);
+        return;
+    }
+
+    pivot = vec[r];
+    i = l - 1;
+    j = r;
+
+    while (true)
+    {
+        while (vec[++i] < pivot)
+            ;
+        while (vec[--j] > pivot)
+            ;
+        if (i >= j)
+            break;
+        tmp = vec[i];
+        vec[i] = vec[j];
+        vec[j] = tmp;
+    }
+    tmp = vec[i];
+    vec[i] = vec[r];
+    vec[r] = tmp;
+
+    if (activeThreads < maxThreads)
+    {
+        pthread_t thread;
+        struct pThreadObj<int> p =
+        {
+            vec, l, i - 1, activeThreads, maxThreads
+        };
+
+        // create a new thread and process it.
+        pthread_create(&thread, NULL, PThreadsRunner, &p);
+        PThreadsSort(vec, i + 1, r, activeThreads, maxThreads);
+
+        pthread_join(thread, NULL);
+        activeThreads--;
+    }
+    else
+    {
+        // all threads are busy, do a serial sort instead
+        SerialQuickSort1_6(vec, l, i - 1);
+        SerialQuickSort1_6(vec, i + 1, r);
+    }
+}
+
+template <typename T>
+void PThreadsSort1(std::vector<T> &vec, int l, int r)
+{
+    // T pivot;
+    // T tmp;
+    // int i, j;
+
+    // if (r - l < INSERT_THRESH)
+    // {
+    //     SerialInsertionSort(vec, l, r);
+    //     return;
+    // }
+
+    // pivot = vec[r];
+    // i = l - 1;
+    // j = r;
+
+    // while (true)
+    // {
+    //     while (vec[++i] < pivot)
+    //         ;
+    //     while (vec[--j] > pivot)
+    //         ;
+    //     if (i >= j)
+    //         break;
+    //     tmp = vec[i];
+    //     vec[i] = vec[j];
+    //     vec[j] = tmp;
+    // }
+    // tmp = vec[i];
+    // vec[i] = vec[r];
+    // vec[r] = tmp;
+
+    // if (busythreads >= threads)
+    // {
+    //     NestedOMPSort1_0(vec, l, i - 1, busythreads, threads);
+    //     NestedOMPSort1_0(vec, i + 1, r, busythreads, threads);
+    // }
+    // else
+    // {
+    //     NestedOMPSort1_0(vec, l, i - 1, busythreads, threads);
+    //     NestedOMPSort1_0(vec, i + 1, r, busythreads, threads);
+    // }
 }
 
 template <typename T>

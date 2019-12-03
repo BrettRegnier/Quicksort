@@ -5,21 +5,30 @@
 #include <chrono>
 #include <omp.h>
 #include <stdio.h>
+#include <pthread.h>
 
 #define INSERT_THRESH 39
 
 template <typename T>
 void SerialInsertionSort(std::vector<T> &vec, int l, int r);
 
-double StartSerialQuickSort(int iter, int size);
+double StartSerialQuickSort1_5(int iter, int size);
 template <typename T>
-void SerialQuickSort(std::vector<T> &vec, int l, int r);
+void SerialQuickSort1_5(std::vector<T> &vec, int l, int r);
+
+double StartSerialQuickSort1_6(int iter, int size);
+template <typename T>
+void SerialQuickSort1_6(std::vector<T> &vec, int l, int r);
 
 double StartStackQuickSort1_0(int iter, int size, int threads);
 template <typename T>
 void StackQuickSort1_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads);
 
-double StartNestedOMPSort1_0(int iter, int size, int threads);
+double StartStackQuickSort2_0(int iter, int size, int threads);
+template <typename T>
+void StackQuickSort2_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads);
+
+double StartNestedOMPSort2_0(int iter, int size, int threads);
 template <typename T>
 void NestedOMPSort1_0(std::vector<T> &vec, int l, int r, int &busythreads, int &threads);
 
@@ -39,14 +48,23 @@ int main()
     double t;
     int s = 10000000;
 
-    // t = StartSerialQuickSort(1, s);
-    // std::cout << "Elapsed serial sort = " << t << std::endl;
+    // t = StartSerialQuickSort1_5(3, s);
+    // std::cout << "Elapsed Serial Quicksort v1.5 = " << t << std::endl;
 
-    // t = StartStackQuickSort1_0(1, s, 4);
-    // std::cout << "Elapsed stack sort 1.0 = " << t << std::endl;
+    // t = StartSerialQuickSort1_6(3, s);
+    // std::cout << "Elapsed Serial Quicksort v1.6 = " << t << std::endl;
 
-    t = StartNestedOMPSort1_0(1, s, 4);
-    std::cout << "Elapsed nested omp sort 1.0 = " << t << std::endl;
+    t = StartStackQuickSort1_0(3, s, 4);
+    std::cout << "Elapsed Stack Quicksort v1.0 = " << t << std::endl;
+
+    t = StartStackQuickSort2_0(3, s, 4);
+    std::cout << "Elapsed Stack Quicksort v2.0 = " << t << std::endl;
+
+    // t = StartNestedOMPSort1_0(3, s, 4);
+    // std::cout << "Elapsed nested omp sort 1.0 = " << t << std::endl;
+
+    // t = StartTaskQueueSort1_0(3, s, 4);
+    // std::cout << "Elapsed nested omp sort 1.0 = " << t << std::endl;
 }
 
 template <typename T>
@@ -66,7 +84,7 @@ void SerialInsertionSort(std::vector<T> &vec, int l, int r)
     }
 }
 
-double StartSerialQuickSort(int iter, int size)
+double StartSerialQuickSort1_5(int iter, int size)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -75,13 +93,12 @@ double StartSerialQuickSort(int iter, int size)
     for (int i = 0; i < iter; i++)
     {
         vec.clear();
-        int n = size;
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < size; i++)
             vec.push_back(rand());
 
         start = omp_get_wtime();
 
-        SerialQuickSort(vec, 0, vec.size() - 1);
+        SerialQuickSort1_5(vec, 0, vec.size() - 1);
 
         stop = omp_get_wtime();
         elapsed += stop - start;
@@ -93,7 +110,64 @@ double StartSerialQuickSort(int iter, int size)
 }
 
 template <typename T>
-void SerialQuickSort(std::vector<T> &vec, int l, int r)
+void SerialQuickSort1_5(std::vector<T> &vec, int l, int r)
+{
+    T pivot;
+    int i, j;
+
+    if (r - l < INSERT_THRESH)
+    {
+        SerialInsertionSort(vec, l, r);
+        return;
+    }
+
+    pivot = vec[r];
+    i = l - 1;
+    j = r;
+
+    while (true)
+    {
+        while (vec[++i] < pivot)
+            ;
+        while (vec[--j] > pivot)
+            ;
+        if (i >= j)
+            break;
+        std::swap(vec[i], vec[j]); // this is slower than just using a tmp, this will not be used outside of this function.
+    }
+    std::swap(vec[i], vec[r]); // this is slower than just using a tmp, this will not be used outside of this function.
+
+    SerialQuickSort1_5(vec, l, i - 1);
+    SerialQuickSort1_5(vec, i + 1, r);
+}
+
+double StartSerialQuickSort1_6(int iter, int size)
+{
+    double elapsed = 0.0f;
+    double start = 0.0f;
+    double stop = 0.0f;
+    std::vector<int> vec;
+    for (int i = 0; i < iter; i++)
+    {
+        vec.clear();
+        for (int i = 0; i < size; i++)
+            vec.push_back(rand());
+
+        start = omp_get_wtime();
+
+        SerialQuickSort1_6(vec, 0, vec.size() - 1);
+
+        stop = omp_get_wtime();
+        elapsed += stop - start;
+    }
+
+    Validate(vec);
+
+    return elapsed / iter;
+}
+
+template <typename T>
+void SerialQuickSort1_6(std::vector<T> &vec, int l, int r)
 {
     T pivot;
     T tmp;
@@ -117,18 +191,18 @@ void SerialQuickSort(std::vector<T> &vec, int l, int r)
             ;
         if (i >= j)
             break;
+        // this is the faster version
         tmp = vec[i];
         vec[i] = vec[j];
         vec[j] = tmp;
-        // std::swap(vec[i], vec[j]); // this is slower than just using a tmp.
     }
+    // this is the faster verison
     tmp = vec[i];
     vec[i] = vec[r];
     vec[r] = tmp;
-    // std::swap(vec[i], vec[r]); // this is slower than just using a tmp
 
-    SerialQuickSort(vec, l, i - 1);
-    SerialQuickSort(vec, i + 1, r);
+    SerialQuickSort1_6(vec, l, i - 1);
+    SerialQuickSort1_6(vec, i + 1, r);
 }
 
 double StartStackQuickSort1_0(int iter, int size, int threads)
@@ -182,7 +256,7 @@ void StackQuickSort1_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<i
         if (r - l < INSERT_THRESH)
         {
             SerialInsertionSort(vec, l, r);
-            l = r;
+            l = r; // set area before l as sorted
         }
 
         while (l >= r)
@@ -250,30 +324,159 @@ void StackQuickSort1_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<i
     }
 }
 
+double StartStackQuickSort2_0(int iter, int size, int threads)
+{
+    double elapsed = 0.0f;
+    double start = 0.0f;
+    double stop = 0.0f;
+    std::vector<int> vec;
+    for (int i = 0; i < iter; i++)
+    {
+        vec.clear();
+        int busythreads = 1;
+        std::stack<std::pair<int, int>> stack;
+
+        for (int i = 0; i < size; i++)
+            vec.push_back(rand());
+
+        start = omp_get_wtime();
+
+#pragma omp parallel num_threads(threads) shared(vec, stack, threads, busythreads)
+        {
+            if (omp_get_thread_num() == 0)
+                StackQuickSort2_0(vec, 0, vec.size() - 1, stack, busythreads, threads);
+            else
+                StackQuickSort2_0(vec, 0, 0, stack, busythreads, threads);
+        }
+
+        stop = omp_get_wtime();
+        elapsed += (stop - start);
+    }
+
+    Validate(vec);
+
+    return elapsed / iter;
+}
+
+template <typename T>
+void StackQuickSort2_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads)
+{
+    T pivot;
+    T tmp;
+    int i, j;
+    bool idle = true;
+    std::pair<int, int> bound;
+
+    std::stack<std::pair<int, int>> localStack;
+
+    if (l != r)
+        idle = false;
+
+    while (true)
+    {
+        if (r - l < INSERT_THRESH)
+        {
+            SerialInsertionSort(vec, l, r);
+            l = r;
+        }
+
+        while (l >= r)
+        {
+            if (!localStack.empty())
+            {
+                bound = localStack.top();
+                localStack.pop();
+                l = bound.first;
+                r = bound.second;
+            }
+            else
+            {
+// Needs to be critical because multiple threads will want access to the stack
+#pragma omp critical
+                {
+                    // if there is stuff on the stack
+                    if (!stack.empty())
+                    {
+                        if (idle)
+                            ++busythreads;
+                        idle = false;
+
+                        bound = stack.top();
+                        stack.pop();
+                        l = bound.first;
+                        r = bound.second;
+                    }
+                    else
+                    {
+                        if (!idle)
+                            --busythreads;
+                        idle = true;
+                    }
+                }
+                // break out if the all threads are done looking for work in the stack
+                if (busythreads == 0)
+                    return;
+            } // end else
+        }     // end while
+
+        pivot = vec[r];
+        i = l - 1;
+        j = r;
+
+        while (true)
+        {
+            // std::cout << "here1" << std::endl;
+            while (vec[++i] < pivot)
+                ;
+            while (vec[--j] > pivot)
+                ;
+            if (i >= j)
+                break;
+            tmp = vec[i];
+            vec[i] = vec[j];
+            vec[j] = tmp;
+        }
+        tmp = vec[i];
+        vec[i] = vec[r];
+        vec[r] = tmp;
+
+        if (i - 1 - l > INSERT_THRESH)
+        {
+            bound = std::make_pair(l, i - 1);
+
+            if (stack.size() < 16)
+#pragma omp critical
+                stack.push(bound);
+            else
+                localStack.push(bound);
+        }
+        else
+            SerialInsertionSort(vec, l, i - 1);
+
+        l = i + 1;
+    }
+}
+
 double StartNestedOMPSort1_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
     double stop = 0.0f;
     std::vector<int> vec;
-    std::vector<double> timing;
-    for (int j = 10; j < 200; j++)
+    for (int i = 0; i < iter; i++)
     {
-            vec.clear();
-            int n = size;
-            for (int i = 0; i < n; i++)
-                vec.push_back(rand());
+        vec.clear();
+        for (int i = 0; i < size; i++)
+            vec.push_back(rand());
 
-            int busythreads = 1;
+        int busythreads = 1;
 
-            start = omp_get_wtime();
+        start = omp_get_wtime();
 
-            NestedOMPSort1_0(vec, 0, vec.size() - 1, busythreads, threads);
+        NestedOMPSort1_0(vec, 0, vec.size() - 1, busythreads, threads);
 
-            stop = omp_get_wtime();
-            elapsed += (stop - start);
-        timing.push_back(elapsed / iter);
-        elapsed = 0.0f;
+        stop = omp_get_wtime();
+        elapsed += (stop - start);
     }
 
     Validate(vec);
@@ -352,6 +555,29 @@ void NestedOMPSort1_0(std::vector<T> &vec, int l, int r, int &busythreads, int &
 
 double StartTaskQueueSort1_0(int iter, int size, int threads)
 {
+    double elapsed = 0.0f;
+    double start = 0.0f;
+    double stop = 0.0f;
+    std::vector<int> vec;
+    for (int i = 0; i < iter; i++)
+    {
+        vec.clear();
+        for (int i = 0; i < size; i++)
+            vec.push_back(rand());
+
+        start = omp_get_wtime();
+
+#pragma omp parallel num_threads(threads) shared(vec)
+#pragma omp single
+        TaskQueueSort1_0(vec, 0, vec.size() - 1);
+
+        stop = omp_get_wtime();
+        elapsed += (stop - start);
+    }
+
+    Validate(vec);
+
+    return elapsed / iter;
 }
 
 template <typename T>
@@ -389,8 +615,13 @@ void TaskQueueSort1_0(std::vector<T> &vec, int l, int r)
     vec[i] = vec[r];
     vec[r] = tmp;
 
-#pragma omp tasq
+#pragma omp task shared(vec)
     {
+        TaskQueueSort1_0(vec, l, i - 1);
+    }
+#pragma omp task shared(vec)
+    {
+        TaskQueueSort1_0(vec, i + 1, r);
     }
 }
 

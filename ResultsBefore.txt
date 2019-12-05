@@ -1,0 +1,115 @@
+threads available = 8
+
+Sorted = 1
+-----------Serial Quicksort v1.5 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Elapsed Serial Quicksort v1.5 = 5.38267
+
+Sorted = 1
+-----------Serial Quicksort v1.6 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Elapsed Serial Quicksort v1.6 = 5.33233
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Elapsed Stack Quicksort v1.0 = 5.34333
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 2
+Array Size = 100000000
+Elapsed Stack Quicksort v1.0 = 2.94267
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 4
+Array Size = 100000000
+Elapsed Stack Quicksort v1.0 = 1.86733
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 8
+Array Size = 100000000
+Elapsed Stack Quicksort v1.0 = 1.61533
+
+Sorted = 1
+-----------Stack Quicksort v2.0 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Elapsed Stack Quicksort v2.0 = 6.52433
+
+Sorted = 1
+-----------Stack Quicksort v2.0 Metrics-----------
+Threads = 2
+Array Size = 100000000
+Elapsed Stack Quicksort v2.0 = 3.41667
+
+Sorted = 1
+-----------Stack Quicksort v2.0 Metrics-----------
+Threads = 4
+Array Size = 100000000
+Elapsed Stack Quicksort v2.0 = 2.02167
+
+Sorted = 1
+-----------Stack Quicksort v2.0 Metrics-----------
+Threads = 8
+Array Size = 100000000
+Elapsed Stack Quicksort v2.0 = 1.90033
+
+Sorted = 1
+-----------Nested OMP Quicksort v1.0 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Elapsed Nested OMP Quicksort v1.0 = 5.379
+
+Sorted = 1
+-----------Nested OMP Quicksort v1.0 Metrics-----------
+Threads = 2
+Array Size = 100000000
+Elapsed Nested OMP Quicksort v1.0 = 4.435
+
+Sorted = 1
+-----------Nested OMP Quicksort v1.0 Metrics-----------
+Threads = 4
+Array Size = 100000000
+Elapsed Nested OMP Quicksort v1.0 = 4.86933
+
+Sorted = 1
+-----------Nested OMP Quicksort v1.0 Metrics-----------
+Threads = 8
+Array Size = 100000000
+Elapsed Nested OMP Quicksort v1.0 = 4.01333
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 1
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 5.02367
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 2
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 2.69033
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 4
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 1.85867
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 8
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 1.38367
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 1
+Array Size = 100000000
+Elapsed PThread Quicksort v1.0 = 5.505

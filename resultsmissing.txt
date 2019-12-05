@@ -1,0 +1,49 @@
+threads available = 8
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 1
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 5.007
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 2
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 2.85
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 4
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 1.65933
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 8
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 1.342
+
+Sorted = 1
+-----------Pthread Quicksort v1.0-----------
+Threads = 1
+Array Size = 100000000
+Elapsed PThread Quicksort v1.0 = 5.36967
+
+Sorted = 1
+-----------Pthread Quicksort v1.0-----------
+Threads = 2
+Array Size = 100000000
+Elapsed PThread Quicksort v1.0 = 3.95467
+
+Sorted = 1
+-----------Pthread Quicksort v1.0-----------
+Threads = 4
+Array Size = 100000000
+Elapsed PThread Quicksort v1.0 = 3.698
+
+Sorted = 1
+-----------Pthread Quicksort v1.0-----------
+Threads = 8
+Array Size = 100000000
+Elapsed PThread Quicksort v1.0 = 3.17367

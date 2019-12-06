@@ -1,5 +1,0 @@
-Their SerialQuickSort at 100million integers takes about 19.4263 seconds
-By changing the program to instead do a swap without calling a function reduced the time to 17.8037 seconds. A small improvement due to avoiding overhead, without -O3
-
-With -O3 flag set their's runs at 5.541
-Mine is 5.33533 seconds

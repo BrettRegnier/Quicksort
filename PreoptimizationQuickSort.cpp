@@ -20,7 +20,7 @@ void SerialQuickSort1_5(std::vector<T> &vec, int l, int r);
 
 double StartSerialQuickSort1_6(int iter, int size);
 template <typename T>
-void SerialQuickSort1_6(T *vec, int l, int r);
+void SerialQuickSort1_6(std::vector<T> &vec, int l, int r);
 
 double StartStackQuickSort1_0(int iter, int size, int threads);
 template <typename T>
@@ -67,20 +67,19 @@ int main()
 
     double t;
     int s = 100000000;
-    // s = 1000000;
     int i;
 
-    // t = StartSerialQuickSort1_5(3, s);
-    // Output(t, s, 1, "-----------Serial Quicksort v1.5 Metrics-----------");
+    t = StartSerialQuickSort1_5(3, s);
+    Output(t, s, 1, "-----------Serial Quicksort v1.5 Metrics-----------");
 
-    // t = StartSerialQuickSort1_6(3, s);
-    // Output(t, s, 1, "-----------Serial Quicksort v1.6 Metrics-----------");
+    t = StartSerialQuickSort1_6(3, s);
+    Output(t, s, 1, "-----------Serial Quicksort v1.6 Metrics-----------");
 
-    for (i = 1; i <= 8; i *= 2)
-    {
-        t = StartStackQuickSort1_0(3, s, 1);
-            Output(t, s, i, "-----------Stack Quicksort v1.0 Metrics-----------");
-    }
+    // for (i = 1; i <= 8; i *= 2)
+    // {
+    //     t = StartStackQuickSort1_0(3, s, i);
+    //         Output(t, s, i, "-----------Stack Quicksort v1.0 Metrics-----------");
+    // }
 
     // for (i = 1; i <= 8; i *= 2)
     // {
@@ -220,11 +219,12 @@ double StartSerialQuickSort1_6(int iter, int size)
     double elapsed = 0.0f;
     double start = 0.0f;
     double stop = 0.0f;
-    int *vec;
+    std::vector<int> vec;
     for (int i = 0; i < iter; i++)
     {
-        vec = (int*)malloc(size * sizeof(int));
-        FillArray(vec, size);
+        vec.clear();
+        for (int i = 0; i < size; i++)
+            vec.push_back(rand());
         
         start = omp_get_wtime();
 
@@ -234,14 +234,13 @@ double StartSerialQuickSort1_6(int iter, int size)
         elapsed += stop - start;
     }
 
-    Validate(vec, size);
-    free(vec);
+    Validate(vec);
 
     return elapsed / iter;
 }
 
 template <typename T>
-void SerialQuickSort1_6(T* vec, int low, int high)
+void SerialQuickSort1_6(std::vector<T> &vec, int low, int high)
 {
     T pivot;
     T tmp;

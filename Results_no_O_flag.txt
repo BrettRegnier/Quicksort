@@ -1,0 +1,133 @@
+threads available = 8
+
+Sorted = 1
+-----------Serial Quicksort v1.5 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Time Elapsed = 24.1297
+
+Sorted = 1
+-----------Serial Quicksort v1.6 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Time Elapsed = 21.9823
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Time Elapsed = 21.718
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Time Elapsed = 21.9397
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Time Elapsed = 21.86
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Time Elapsed = 21.7893
+
+Sorted = 1
+-----------Stack Quicksort v2.0 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Elapsed Stack Quicksort v2.0 = 22.4363
+
+Sorted = 1
+-----------Stack Quicksort v2.0 Metrics-----------
+Threads = 2
+Array Size = 100000000
+Elapsed Stack Quicksort v2.0 = 11.753
+
+Sorted = 1
+-----------Stack Quicksort v2.0 Metrics-----------
+Threads = 4
+Array Size = 100000000
+Elapsed Stack Quicksort v2.0 = 6.682
+
+Sorted = 1
+-----------Stack Quicksort v2.0 Metrics-----------
+Threads = 8
+Array Size = 100000000
+Elapsed Stack Quicksort v2.0 = 6.29167
+
+Sorted = 1
+-----------Nested OMP Quicksort v1.0 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Elapsed Nested OMP Quicksort v1.0 = 21.776
+
+Sorted = 1
+-----------Nested OMP Quicksort v1.0 Metrics-----------
+Threads = 2
+Array Size = 100000000
+Elapsed Nested OMP Quicksort v1.0 = 18.2137
+
+Sorted = 1
+-----------Nested OMP Quicksort v1.0 Metrics-----------
+Threads = 4
+Array Size = 100000000
+Elapsed Nested OMP Quicksort v1.0 = 21.5517
+
+Sorted = 1
+-----------Nested OMP Quicksort v1.0 Metrics-----------
+Threads = 8
+Array Size = 100000000
+Elapsed Nested OMP Quicksort v1.0 = 16.6403
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 1
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 22
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 2
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 12.5143
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 4
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 7.66667
+
+Sorted = 1
+-----------Task Queue Quicksort v1.0-----------
+Threads = 8
+Array Size = 100000000
+Elapsed Task Queue Quicksort v1.0 = 5.67133
+
+Sorted = 1
+-----------PThreads Quicksort v1.0-----------
+Threads = 1
+Array Size = 100000000
+Elapsed PThread Quicksort v1.0 = 21.663
+
+Sorted = 1
+-----------PThreads Quicksort v1.0-----------
+Threads = 2
+Array Size = 100000000
+Elapsed PThread Quicksort v1.0 = 16.7723
+
+Sorted = 1
+-----------PThreads Quicksort v1.0-----------
+Threads = 4
+Array Size = 100000000
+Elapsed PThread Quicksort v1.0 = 14.599
+
+Sorted = 1
+-----------PThreads Quicksort v1.0-----------
+Threads = 8
+Array Size = 100000000
+Elapsed PThread Quicksort v1.0 = 11.3987

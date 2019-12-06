@@ -1,0 +1,7 @@
+threads available = 8
+
+Sorted = 1
+-----------Serial Quicksort v1.6 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Time Elapsed = 11.9383

@@ -12,49 +12,47 @@
 template <typename T>
 void SerialInsertionSort(std::vector<T> &vec, int l, int r);
 template <typename T>
-void SerialInsertionSort(T *vec, int l, int r);
+void SerialInsertionSort(T &vec, int l, int r);
 
 double StartSerialQuickSort1_5(int iter, int size);
 template <typename T>
-void SerialQuickSort1_5(std::vector<T> &vec, int l, int r);
+void SerialQuickSort1_5(T &vec, int l, int r);
 
 double StartSerialQuickSort1_6(int iter, int size);
 template <typename T>
-void SerialQuickSort1_6(T *vec, int l, int r);
+void SerialQuickSort1_6(T &vec, int l, int r);
 
 double StartStackQuickSort1_0(int iter, int size, int threads);
 template <typename T>
-void StackQuickSort1_0(std::vector<T> &vec, int low, int high, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads);
+void StackQuickSort1_0(T &vec, int l, int r, std::stack<int> &stack, int &busythreads, const int threads);
 
 double StartStackQuickSort2_0(int iter, int size, int threads);
 template <typename T>
-void StackQuickSort2_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads);
+void StackQuickSort2_0(T &vec, int l, int r, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads);
 
 double StartNestedOMPSort1_0(int iter, int size, int threads);
 template <typename T>
-void NestedOMPSort1_0(std::vector<T> &vec, int l, int r, int &busythreads, int &threads);
+void NestedOMPSort1_0(T &vec, int l, int r, int &busythreads, int &threads);
 
 double StartTaskQueueSort1_0(int iter, int size, int threads);
 template <typename T>
-void TaskQueueSort1_0(std::vector<T> &vec, int l, int r);
+void TaskQueueSort1_0(T &vec, int l, int r);
 
 double StartPThreadsSort(int iter, int size, int threads);
 void *PThreadsRunner(void *param);
 template <typename T>
-void PThreadsSort(std::vector<T> &vec, int l, int r, int &activeThreads, int maxThreads);
+void PThreadsSort(T &vec, int l, int r, int &activeThreads, int maxThreads);
 
 template <typename T>
-void FillArray(T* vec, int s);
+void FillVector(T &vec);
 template <typename T>
-bool Validate(std::vector<T> &vec);
-template <typename T>
-bool Validate(T *vec, int s);
+bool Validate(T &vec);
 void Output(double time, int s, int threads, char const name[100]);
 
 template <typename T>
 struct pThreadObj
 {
-    std::vector<T> &vec;
+    T &vec;
     int l;
     int r;
     int &activeThreads;
@@ -67,20 +65,20 @@ int main()
 
     double t;
     int s = 100000000;
-    // s = 1000000;
+    // s = 20000000;
     int i;
 
     // t = StartSerialQuickSort1_5(3, s);
     // Output(t, s, 1, "-----------Serial Quicksort v1.5 Metrics-----------");
 
-    // t = StartSerialQuickSort1_6(3, s);
-    // Output(t, s, 1, "-----------Serial Quicksort v1.6 Metrics-----------");
+    t = StartSerialQuickSort1_6(3, s);
+    Output(t, s, 1, "-----------Serial Quicksort v1.6 Metrics-----------");
 
-    for (i = 1; i <= 8; i *= 2)
-    {
-        t = StartStackQuickSort1_0(3, s, 1);
-            Output(t, s, i, "-----------Stack Quicksort v1.0 Metrics-----------");
-    }
+    // for (i = 1; i <= 8; i *= 2)
+    // {
+        // t = StartStackQuickSort1_0(3, s, 1);
+        //     Output(t, s, 1, "-----------Stack Quicksort v1.0 Metrics-----------");
+    // }
 
     // for (i = 1; i <= 8; i *= 2)
     // {
@@ -124,7 +122,7 @@ void SerialInsertionSort(std::vector<T> &vec, int low, int high)
 {
     int i = low;
     int j;
-    T tmp;
+    int tmp;
     while (i <= high)
     {
         j = i;
@@ -138,16 +136,17 @@ void SerialInsertionSort(std::vector<T> &vec, int low, int high)
         i = i + 1;
     }
 }
+
 template <typename T>
-void SerialInsertionSort(T* vec, int low, int high)
+void SerialInsertionSort(T &vec, int l, int r)
 {
     int i = low;
     int j;
-    T tmp;
+    int tmp;
     while (i <= high)
     {
         j = i;
-        while (j > 0 && vec[j - 1] > vec[j])
+        while (j > 0 && vec[j-1] > vec[j])
         {
             tmp = vec[j];
             vec[j] = vec[j-1];
@@ -184,7 +183,7 @@ double StartSerialQuickSort1_5(int iter, int size)
 }
 
 template <typename T>
-void SerialQuickSort1_5(std::vector<T> &vec, int low, int high)
+void SerialQuickSort1_5(T &vec, int low, int high)
 {
     T pivot;
     int i, j;
@@ -220,28 +219,28 @@ double StartSerialQuickSort1_6(int iter, int size)
     double elapsed = 0.0f;
     double start = 0.0f;
     double stop = 0.0f;
-    int *vec;
+    std::vector<int> vec;
     for (int i = 0; i < iter; i++)
     {
-        vec = (int*)malloc(size * sizeof(int));
-        FillArray(vec, size);
-        
+        vec.clear();
+        for (int i = 0; i < size; i++)
+            vec.push_back(rand());
+
         start = omp_get_wtime();
 
-        SerialQuickSort1_6(vec, 0, size - 1);
+        SerialQuickSort1_6(vec, 0, vec.size() - 1);
 
         stop = omp_get_wtime();
         elapsed += stop - start;
     }
 
-    Validate(vec, size);
-    free(vec);
+    Validate(vec);
 
     return elapsed / iter;
 }
 
 template <typename T>
-void SerialQuickSort1_6(T* vec, int low, int high)
+void SerialQuickSort1_6(T &vec, int low, int high)
 {
     T pivot;
     T tmp;
@@ -253,8 +252,8 @@ void SerialQuickSort1_6(T* vec, int low, int high)
         return;
     }
 
-    pivot = vec[high];
-    i = low - 1;
+    pivot = vec[high];  // choose a pivot
+    i = low - 1;        // decrement so that the below loop doesn't break
     j = high;
 
     while (true)
@@ -289,7 +288,7 @@ double StartStackQuickSort1_0(int iter, int size, int threads)
     {
         vec.clear();
         int busythreads = 1;
-        std::stack<std::pair<int, int>> stack;
+        std::stack<int> stack;
 
         for (int i = 0; i < size; i++)
             vec.push_back(rand());
@@ -314,13 +313,13 @@ double StartStackQuickSort1_0(int iter, int size, int threads)
 }
 
 template <typename T>
-void StackQuickSort1_0(std::vector<T> &vec, int low, int high, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads)
+void StackQuickSort1_0(T &vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads)
 {
     T pivot;
     T tmp;
     int i, j;
     bool idle = true;
-    std::pair<int, int> bound;
+    // std::pair<int, int> bound;
 
     if (low != high)
         idle = false;
@@ -344,16 +343,16 @@ void StackQuickSort1_0(std::vector<T> &vec, int low, int high, std::stack<std::p
                         ++busythreads;
                     idle = false;
 
-                    bound = stack.top();
+                    // bound = stack.top();
+                    // stack.pop();
+
+                    // low = bound.first;
+                    // high = bound.second;
+
+                    low = stack.top();
                     stack.pop();
-
-                    low = bound.first;
-                    high = bound.second;
-
-                    // low = stack.top();
-                    // stack.pop();
-                    // high = stack.top();
-                    // stack.pop();
+                    high = stack.top();
+                    stack.pop();
                 }
                 else
                 {
@@ -391,15 +390,15 @@ void StackQuickSort1_0(std::vector<T> &vec, int low, int high, std::stack<std::p
         // If there is a lot of work to do stil put stuff on the stack.
         if (i - 1 - low > INSERT_THRESH)
         {
-            bound = std::make_pair(low, i - 1);
+            // bound = std::make_pair(low, i - 1);
 
 // Ensure only one thread can push on the stack at a time. 
 // Operation is so quick this almost isn't needed.
 #pragma omp critical
             {
-                // stack.push(i-1);
-                // stack.push(low);
-                stack.push(bound);
+                stack.push(i-1);
+                stack.push(low);
+                // stack.push(bound);
             }
         }
         else
@@ -444,7 +443,7 @@ double StartStackQuickSort2_0(int iter, int size, int threads)
 }
 
 template <typename T>
-void StackQuickSort2_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads)
+void StackQuickSort2_0(T &vec, int l, int r, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads)
 {
     T pivot;
     T tmp;
@@ -569,7 +568,7 @@ double StartNestedOMPSort1_0(int iter, int size, int threads)
 }
 
 template <typename T>
-void NestedOMPSort1_0(std::vector<T> &vec, int l, int r, int &busythreads, int &threads)
+void NestedOMPSort1_0(T &vec, int l, int r, int &busythreads, int &threads)
 {
     T pivot;
     T tmp;
@@ -664,7 +663,7 @@ double StartTaskQueueSort1_0(int iter, int size, int threads)
 }
 
 template <typename T>
-void TaskQueueSort1_0(std::vector<T> &vec, int l, int r)
+void TaskQueueSort1_0(T &vec, int l, int r)
 {
 
     T pivot;
@@ -743,7 +742,7 @@ void *PThreadsRunner(void *param)
 }
 
 template <typename T>
-void PThreadsSort(std::vector<T> &vec, int l, int r, int &activeThreads, int const maxThreads)
+void PThreadsSort(T &vec, int l, int r, int &activeThreads, int const maxThreads)
 {
     T pivot;
     T tmp;
@@ -793,39 +792,23 @@ void PThreadsSort(std::vector<T> &vec, int l, int r, int &activeThreads, int con
     else
     {
         // all threads are busy, do a serial sort instead
-        PThreadsSort(vec, l, i - 1, activeThreads, maxThreads);
-        PThreadsSort(vec, i + 1, r, activeThreads, maxThreads);
+        SerialQuickSort1_6(vec, l, i - 1);
+        SerialQuickSort1_6(vec, i + 1, r);
     }
 }
 
 template <typename T>
-void FillArray(T* vec, int s)
+void FillVector(T &vec)
 {
-    srand(777);
-    for (int i = 0; i < s; i++)
-        vec[i] = rand();
+    
 }
 
 template <typename T>
-bool Validate(std::vector<T> &vec)
+bool Validate(T &vec)
 {
     int leng = vec.size();
     bool isSorted = true;
     for (int i = 1; i < leng; i++)
-    {
-        if (vec[i - 1] > vec[i])
-            isSorted = false;
-    }
-
-    std::cout << "\nSorted = " << isSorted << std::endl;
-    return isSorted;
-}
-
-template <typename T>
-bool Validate(T* vec, int s)
-{
-    bool isSorted = true;
-    for (int i = 1; i < s; i++)
     {
         if (vec[i - 1] > vec[i])
             isSorted = false;

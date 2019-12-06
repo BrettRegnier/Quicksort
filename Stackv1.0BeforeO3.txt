@@ -1,0 +1,25 @@
+threads available = 8
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 1
+Array Size = 100000000
+Time Elapsed = 7.043
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 2
+Array Size = 100000000
+Time Elapsed = 7.161
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 4
+Array Size = 100000000
+Time Elapsed = 6.965
+
+Sorted = 1
+-----------Stack Quicksort v1.0 Metrics-----------
+Threads = 8
+Array Size = 100000000
+Time Elapsed = 7.055

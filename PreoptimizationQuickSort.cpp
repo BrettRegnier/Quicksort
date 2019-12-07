@@ -18,27 +18,27 @@ double StartSerialQuickSort1_5(int iter, int size);
 template <typename T>
 void SerialQuickSort1_5(std::vector<T> &vec, int l, int r);
 
-double StartSerialQuickSort1_6(int iter, int size);
+double StartSerialQuickSort2_6(int iter, int size);
 template <typename T>
 void SerialQuickSort1_6(std::vector<T> &vec, int l, int r);
 
-double StartStackQuickSort1_0(int iter, int size, int threads);
+double StartStackQuickSort1_1(int iter, int size, int threads);
 template <typename T>
 void StackQuickSort1_0(std::vector<T> &vec, int low, int high, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads);
 
-double StartStackQuickSort2_0(int iter, int size, int threads);
+double StartStackQuickSort2_1(int iter, int size, int threads);
 template <typename T>
 void StackQuickSort2_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<int, int>> &stack, int &busythreads, const int threads);
 
-double StartNestedOMPSort1_0(int iter, int size, int threads);
+double StartNestedOMPSort2_0(int iter, int size, int threads);
 template <typename T>
 void NestedOMPSort1_0(std::vector<T> &vec, int l, int r, int &busythreads, int &threads);
 
-double StartTaskQueueSort1_0(int iter, int size, int threads);
+double StartTaskQueueSort2_0(int iter, int size, int threads);
 template <typename T>
 void TaskQueueSort1_0(std::vector<T> &vec, int l, int r);
 
-double StartPThreadsSort(int iter, int size, int threads);
+double StartPThreadsSort2_0(int iter, int size, int threads);
 void *PThreadsRunner(void *param);
 template <typename T>
 void PThreadsSort(std::vector<T> &vec, int l, int r, int &activeThreads, int maxThreads);
@@ -72,7 +72,7 @@ int main()
     t = StartSerialQuickSort1_5(3, s);
     Output(t, s, 1, "-----------Serial Quicksort v1.5 Metrics-----------");
 
-    t = StartSerialQuickSort1_6(3, s);
+    t = StartSerialQuickSort2_6(3, s);
     Output(t, s, 1, "-----------Serial Quicksort v1.6 Metrics-----------");
 
     // for (i = 1; i <= 8; i *= 2)
@@ -214,7 +214,7 @@ void SerialQuickSort1_5(std::vector<T> &vec, int low, int high)
     SerialQuickSort1_5(vec, i + 1, high);
 }
 
-double StartSerialQuickSort1_6(int iter, int size)
+double StartSerialQuickSort2_6(int iter, int size)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -278,7 +278,7 @@ void SerialQuickSort1_6(std::vector<T> &vec, int low, int high)
     SerialQuickSort1_6(vec, i + 1, high);
 }
 
-double StartStackQuickSort1_0(int iter, int size, int threads)
+double StartStackQuickSort1_1(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -408,7 +408,7 @@ void StackQuickSort1_0(std::vector<T> &vec, int low, int high, std::stack<std::p
     } while (true);
 }
 
-double StartStackQuickSort2_0(int iter, int size, int threads)
+double StartStackQuickSort2_1(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -540,7 +540,7 @@ void StackQuickSort2_0(std::vector<T> &vec, int l, int r, std::stack<std::pair<i
     }
 }
 
-double StartNestedOMPSort1_0(int iter, int size, int threads)
+double StartNestedOMPSort2_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -635,7 +635,7 @@ void NestedOMPSort1_0(std::vector<T> &vec, int l, int r, int &busythreads, int &
     }
 }
 
-double StartTaskQueueSort1_0(int iter, int size, int threads)
+double StartTaskQueueSort2_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -706,7 +706,7 @@ void TaskQueueSort1_0(std::vector<T> &vec, int l, int r)
     }
 }
 
-double StartPThreadsSort(int iter, int size, int threads)
+double StartPThreadsSort2_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;

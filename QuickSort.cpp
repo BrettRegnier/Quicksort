@@ -18,30 +18,30 @@ double StartSerialQuickSort1_5(int iter, int size);
 template <typename T>
 void SerialQuickSort1_5(std::vector<T> &vec, int l, int r);
 
-double StartSerialQuickSort1_6(int iter, int size);
+double StartSerialQuickSort2_6(int iter, int size);
 template <typename T>
-void SerialQuickSort1_6(T *vec, int l, int r);
+void SerialQuickSort2_6(T *vec, int l, int r);
 
-double StartStackQuickSort1_0(int iter, int size, int threads);
+double StartStackQuickSort3_0(int iter, int size, int threads);
 template <typename T>
-void StackQuickSort1_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads);
+void StackQuickSort3_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads);
 
-double StartStackQuickSort2_0(int iter, int size, int threads);
+double StartStackQuickSort4_0(int iter, int size, int threads);
 template <typename T>
-void StackQuickSort2_0(T *vec, int l, int r, std::stack<int> &stack, int &busythreads, const int threads);
+void StackQuickSort4_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads);
 
-double StartNestedOMPSort1_0(int iter, int size, int threads);
+double StartNestedOMPSort2_0(int iter, int size, int threads);
 template <typename T>
-void NestedOMPSort1_0(T *vec, int l, int r, int &busythreads, int &threads);
+void NestedOMPSort2_0(T *vec, int low, int high, int &busythreads, int &threads);
 
-double StartTaskQueueSort1_0(int iter, int size, int threads);
+double StartTaskQueueSort2_0(int iter, int size, int threads);
 template <typename T>
-void TaskQueueSort1_0(T *vec, int l, int r);
+void TaskQueueSort2_0(T *vec, int l, int r);
 
-double StartPThreadsSort(int iter, int size, int threads);
+double StartPThreadsSort2_0(int iter, int size, int threads);
 void *PThreadsRunner(void *param);
 template <typename T>
-void PThreadsSort(T *vec, int l, int r, int &activeThreads, int maxThreads);
+void PThreadsSort2_0(T *vec, int l, int r, int &activeThreads, int maxThreads);
 
 template <typename T>
 void FillArray(T *vec, int s);
@@ -58,8 +58,8 @@ template <typename T>
 struct pThreadObj
 {
     T* vec;
-    int l;
-    int r;
+    int low;
+    int high;
     int &activeThreads;
     int maxThreads;
 };
@@ -70,42 +70,41 @@ int main()
 
     double t;
     int s = 100000000;
-    // s = 1000000;
     int i;
 
     t = StartSerialQuickSort1_5(3, s);
     Output(t, s, 1, "-----------Serial Quicksort v1.5 Metrics-----------");
 
-    t = StartSerialQuickSort1_6(3, s);
+    t = StartSerialQuickSort2_6(3, s);
     Output(t, s, 1, "-----------Serial Quicksort v1.6 Metrics-----------");
 
     for (i = 1; i <= 8; i *= 2)
     {
-        t = StartStackQuickSort1_0(3, s, i);
+        t = StartStackQuickSort3_0(3, s, i);
         Output(t, s, i, "-----------Stack Quicksort v1.0 Metrics-----------");
     }
 
     for (i = 1; i <= 8; i *= 2)
     {
-        t = StartStackQuickSort2_0(3, s, i);
+        t = StartStackQuickSort4_0(3, s, i);
         Output(t, s, i, "-----------Stack Quicksort v2.0 Metrics-----------");
     }
 
     for (i = 1; i <= 8; i *= 2)
     {
-        t = StartNestedOMPSort1_0(3, s, i);
+        t = StartNestedOMPSort2_0(3, s, i);
         Output(t, s, i,  "-----------Nested OMP Quicksort v1.0 Metrics-----------");
     }
 
     for (i = 1; i <= 8; i *= 2)
     {
-        t = StartTaskQueueSort1_0(3, s, i);
+        t = StartTaskQueueSort2_0(3, s, i);
         Output(t, s, i,  "-----------Task Queue Quicksort v1.0-----------");
     }
 
     for (i = 1; i <= 8; i *= 2)
     {
-        t = StartPThreadsSort(3, s, i);
+        t = StartPThreadsSort2_0(3, s, i);
         Output(t, s, i,  "-----------PThreads Quicksort v1.0-----------");
     }
 }
@@ -206,7 +205,7 @@ void SerialQuickSort1_5(std::vector<T> &vec, int low, int high)
     SerialQuickSort1_5(vec, i + 1, high);
 }
 
-double StartSerialQuickSort1_6(int iter, int size)
+double StartSerialQuickSort2_6(int iter, int size)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -220,7 +219,7 @@ double StartSerialQuickSort1_6(int iter, int size)
 
         start = omp_get_wtime();
 
-        SerialQuickSort1_6(vec, 0, size - 1);
+        SerialQuickSort2_6(vec, 0, size - 1);
 
         stop = omp_get_wtime();
         elapsed += stop - start;
@@ -237,7 +236,7 @@ double StartSerialQuickSort1_6(int iter, int size)
 }
 
 template <typename T>
-void SerialQuickSort1_6(T *vec, int low, int high)
+void SerialQuickSort2_6(T *vec, int low, int high)
 {
     T pivot;
     T tmp;
@@ -271,11 +270,11 @@ void SerialQuickSort1_6(T *vec, int low, int high)
     vec[i] = vec[high];
     vec[high] = tmp;
 
-    SerialQuickSort1_6(vec, low, i - 1);
-    SerialQuickSort1_6(vec, i + 1, high);
+    SerialQuickSort2_6(vec, low, i - 1);
+    SerialQuickSort2_6(vec, i + 1, high);
 }
 
-double StartStackQuickSort1_0(int iter, int size, int threads)
+double StartStackQuickSort3_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -295,9 +294,9 @@ double StartStackQuickSort1_0(int iter, int size, int threads)
 #pragma omp parallel num_threads(threads) shared(vec, stack, threads, busythreads)
         {
             if (omp_get_thread_num() == 0)
-                StackQuickSort1_0(vec, 0, size - 1, stack, busythreads, threads);
+                StackQuickSort3_0(vec, 0, size - 1, stack, busythreads, threads);
             else
-                StackQuickSort1_0(vec, 0, 0, stack, busythreads, threads);
+                StackQuickSort3_0(vec, 0, 0, stack, busythreads, threads);
         }
 
         stop = omp_get_wtime();
@@ -315,7 +314,7 @@ double StartStackQuickSort1_0(int iter, int size, int threads)
 }
 
 template <typename T>
-void StackQuickSort1_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads)
+void StackQuickSort3_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads)
 {
     T pivot;
     T tmp;
@@ -402,7 +401,7 @@ void StackQuickSort1_0(T *vec, int low, int high, std::stack<int> &stack, int &b
     } while (true);
 }
 
-double StartStackQuickSort2_0(int iter, int size, int threads)
+double StartStackQuickSort4_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -422,9 +421,9 @@ double StartStackQuickSort2_0(int iter, int size, int threads)
 #pragma omp parallel num_threads(threads) shared(vec, stack, threads, busythreads)
         {
             if (omp_get_thread_num() == 0)
-                StackQuickSort2_0(vec, 0, size - 1, stack, busythreads, threads);
+                StackQuickSort4_0(vec, 0, size - 1, stack, busythreads, threads);
             else
-                StackQuickSort2_0(vec, 0, 0, stack, busythreads, threads);
+                StackQuickSort4_0(vec, 0, 0, stack, busythreads, threads);
         }
 
         stop = omp_get_wtime();
@@ -442,7 +441,7 @@ double StartStackQuickSort2_0(int iter, int size, int threads)
 }
 
 template <typename T>
-void StackQuickSort2_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads)
+void StackQuickSort4_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads)
 {
     T pivot;
     T tmp;
@@ -549,7 +548,7 @@ void StackQuickSort2_0(T *vec, int low, int high, std::stack<int> &stack, int &b
     }
 }
 
-double StartNestedOMPSort1_0(int iter, int size, int threads)
+double StartNestedOMPSort2_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -565,7 +564,7 @@ double StartNestedOMPSort1_0(int iter, int size, int threads)
 
         start = omp_get_wtime();
 
-        NestedOMPSort1_0(vec, 0, size - 1, busythreads, threads);
+        NestedOMPSort2_0(vec, 0, size - 1, busythreads, threads);
 
         stop = omp_get_wtime();
         elapsed += (stop - start);
@@ -581,21 +580,21 @@ double StartNestedOMPSort1_0(int iter, int size, int threads)
 }
 
 template <typename T>
-void NestedOMPSort1_0(T *vec, int l, int r, int &busythreads, int &threads)
+void NestedOMPSort2_0(T *vec, int low, int high, int &busythreads, int &threads)
 {
     T pivot;
     T tmp;
     int i, j;
 
-    if (r - l < INSERT_THRESH)
+    if (high - low < INSERT_THRESH)
     {
-        SerialInsertionSort(vec, l, r);
+        SerialInsertionSort(vec, low, high);
         return;
     }
 
-    pivot = vec[r];
-    i = l - 1;
-    j = r;
+    pivot = vec[high];
+    i = low - 1;
+    j = high;
 
     while (true)
     {
@@ -610,32 +609,32 @@ void NestedOMPSort1_0(T *vec, int l, int r, int &busythreads, int &threads)
         vec[j] = tmp;
     }
     tmp = vec[i];
-    vec[i] = vec[r];
-    vec[r] = tmp;
+    vec[i] = vec[high];
+    vec[high] = tmp;
 
     if (busythreads >= threads)
     {
-        NestedOMPSort1_0(vec, l, i - 1, busythreads, threads);
-        NestedOMPSort1_0(vec, i + 1, r, busythreads, threads);
+        NestedOMPSort2_0(vec, low, i - 1, busythreads, threads);
+        NestedOMPSort2_0(vec, i + 1, high, busythreads, threads);
     }
     else
     {
         busythreads += 2;
 
-#pragma omp parallel num_threads(threads) shared(vec, threads, busythreads, i, l, r)
+#pragma omp parallel num_threads(threads) shared(vec, threads, busythreads, i, low, high)
         {
 #pragma omp sections nowait
             {
 #pragma omp section
                 {
-                    NestedOMPSort1_0(vec, l, i - 1, busythreads, threads);
+                    NestedOMPSort2_0(vec, low, i - 1, busythreads, threads);
 
                     // this occurs because it will happen after the thread has come about out of the recursive step
                     busythreads--;
                 }
 #pragma omp section
                 {
-                    NestedOMPSort1_0(vec, i + 1, r, busythreads, threads);
+                    NestedOMPSort2_0(vec, i + 1, high, busythreads, threads);
 
                     // this occurs because it will happen after the thread has come about out of the recursive step
                     busythreads--;
@@ -645,7 +644,7 @@ void NestedOMPSort1_0(T *vec, int l, int r, int &busythreads, int &threads)
     }
 }
 
-double StartTaskQueueSort1_0(int iter, int size, int threads)
+double StartTaskQueueSort2_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -661,7 +660,7 @@ double StartTaskQueueSort1_0(int iter, int size, int threads)
 
 #pragma omp parallel num_threads(threads) shared(vec)
 #pragma omp single
-        TaskQueueSort1_0(vec, 0, size - 1);
+        TaskQueueSort2_0(vec, 0, size - 1);
 
         stop = omp_get_wtime();
         elapsed += (stop - start);
@@ -678,22 +677,22 @@ double StartTaskQueueSort1_0(int iter, int size, int threads)
 }
 
 template <typename T>
-void TaskQueueSort1_0(T *vec, int l, int r)
+void TaskQueueSort2_0(T *vec, int low, int high)
 {
 
     T pivot;
     T tmp;
     int i, j;
 
-    if (r - l < INSERT_THRESH)
+    if (high - low < INSERT_THRESH)
     {
-        SerialInsertionSort(vec, l, r);
+        SerialInsertionSort(vec, low, high);
         return;
     }
 
-    pivot = vec[r];
-    i = l - 1;
-    j = r;
+    pivot = vec[high];
+    i = low - 1;
+    j = high;
 
     while (true)
     {
@@ -708,20 +707,20 @@ void TaskQueueSort1_0(T *vec, int l, int r)
         vec[j] = tmp;
     }
     tmp = vec[i];
-    vec[i] = vec[r];
-    vec[r] = tmp;
+    vec[i] = vec[high];
+    vec[high] = tmp;
 
 #pragma omp task shared(vec)
     {
-        TaskQueueSort1_0(vec, l, i - 1);
+        TaskQueueSort2_0(vec, low, i - 1);
     }
 #pragma omp task shared(vec)
     {
-        TaskQueueSort1_0(vec, i + 1, r);
+        TaskQueueSort2_0(vec, i + 1, high);
     }
 }
 
-double StartPThreadsSort(int iter, int size, int threads)
+double StartPThreadsSort2_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -737,7 +736,7 @@ double StartPThreadsSort(int iter, int size, int threads)
 
         start = omp_get_wtime();
 
-        PThreadsSort(vec, 0, size - 1, activeThreads, threads);
+        PThreadsSort2_0(vec, 0, size - 1, activeThreads, threads);
 
         stop = omp_get_wtime();
         elapsed += (stop - start);
@@ -758,26 +757,26 @@ void *PThreadsRunner(void *param)
     struct pThreadObj<int> p = *(static_cast<pThreadObj<int> *>(param));
     p.activeThreads++;
 
-    PThreadsSort(p.vec, p.l, p.r, p.activeThreads, p.maxThreads);
+    PThreadsSort2_0(p.vec, p.low, p.high, p.activeThreads, p.maxThreads);
     return NULL;
 }
 
 template <typename T>
-void PThreadsSort(T *vec, int l, int r, int &activeThreads, int const maxThreads)
+void PThreadsSort2_0(T *vec, int low, int high, int &activeThreads, int const maxThreads)
 {
     T pivot;
     T tmp;
     int i, j;
 
-    if (r - l < INSERT_THRESH)
+    if (high - low < INSERT_THRESH)
     {
-        SerialInsertionSort(vec, l, r);
+        SerialInsertionSort(vec, low, high);
         return;
     }
 
-    pivot = vec[r];
-    i = l - 1;
-    j = r;
+    pivot = vec[high];
+    i = low - 1;
+    j = high;
 
     while (true)
     {
@@ -792,20 +791,20 @@ void PThreadsSort(T *vec, int l, int r, int &activeThreads, int const maxThreads
         vec[j] = tmp;
     }
     tmp = vec[i];
-    vec[i] = vec[r];
-    vec[r] = tmp;
+    vec[i] = vec[high];
+    vec[high] = tmp;
 
     if (activeThreads < maxThreads)
     {
         pthread_t thread;
         struct pThreadObj<int> p =
         {
-            vec, l, i - 1, activeThreads, maxThreads
+            vec, low, i - 1, activeThreads, maxThreads
         };
 
         // create a new thread and process it.
         pthread_create(&thread, NULL, PThreadsRunner, &p);
-        PThreadsSort(vec, i + 1, r, activeThreads, maxThreads);
+        PThreadsSort2_0(vec, i + 1, high, activeThreads, maxThreads);
 
         pthread_join(thread, NULL);
         activeThreads--;
@@ -813,8 +812,8 @@ void PThreadsSort(T *vec, int l, int r, int &activeThreads, int const maxThreads
     else
     {
         // all threads are busy, do a serial sort instead
-        PThreadsSort(vec, l, i - 1, activeThreads, maxThreads);
-        PThreadsSort(vec, i + 1, r, activeThreads, maxThreads);
+        PThreadsSort2_0(vec, low, i - 1, activeThreads, maxThreads);
+        PThreadsSort2_0(vec, i + 1, high, activeThreads, maxThreads);
     }
 }
 

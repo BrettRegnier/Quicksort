@@ -1,4 +1,4 @@
-CC = g++
+CC = /usr/bin/g++
 CFLAGS = -g -fopenmp -pthread
 
 all: QuicksortO3 Quicksort

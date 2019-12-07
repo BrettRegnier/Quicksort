@@ -6,10 +6,10 @@ all: QuicksortO3 Quicksort
 	-tar -cvf ${USER}-handin.tar Quicksort.cpp Report.pdf Makefile
 
 QuicksortO3: Quicksort.cpp
-	$(CC) $(CFLAGS) -O3 -o QuicksortO3.out Quicksort.cpp
+	$(CC) $(CFLAGS) -O3 -o QuicksortO3 Quicksort.cpp
 	
 Quicksort: Quicksort.cpp
-	$(CC) $(CFLAGS) -o Quicksort.out Quicksort.cpp
+	$(CC) $(CFLAGS) -o Quicksort Quicksort.cpp
 
 clean:
 	rm -rf *.o

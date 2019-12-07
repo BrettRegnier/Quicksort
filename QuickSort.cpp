@@ -7,8 +7,11 @@
 #include <stdio.h>
 #include <pthread.h>
 
+// Found based on running experiments and finding the best threshold
+// based on the fastest time after running multiple times to get this number
 #define INSERT_THRESH 39
 
+// Basic Serial Insertion Sort 2 versions.
 template <typename T>
 void SerialInsertionSort(std::vector<T> &vec, int l, int r);
 template <typename T>
@@ -20,28 +23,28 @@ void SerialQuickSort1_5(std::vector<T> &vec, int l, int r);
 
 double StartSerialQuickSort2_6(int iter, int size);
 template <typename T>
-void SerialQuickSort2_6(T *vec, int l, int r);
+void SerialQuickSort2_6(T *vec, int low, int high);
 
 double StartStackQuickSort3_0(int iter, int size, int threads);
 template <typename T>
-void StackQuickSort3_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads);
+void StackQuickSort3_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads);
 
 double StartStackQuickSort4_0(int iter, int size, int threads);
 template <typename T>
-void StackQuickSort4_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads);
+void StackQuickSort4_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads);
 
 double StartNestedOMPSort2_0(int iter, int size, int threads);
 template <typename T>
 void NestedOMPSort2_0(T *vec, int low, int high, int &busythreads, int &threads);
 
-double StartTaskQueueSort2_0(int iter, int size, int threads);
+double StartTaskQueueQuickSort2_0(int iter, int size, int threads);
 template <typename T>
-void TaskQueueSort2_0(T *vec, int l, int r);
+void TaskQueueQuickSort2_0(T *vec, int l, int r);
 
-double StartPThreadsSort2_0(int iter, int size, int threads);
+double StartPThreadsQuickSort2_0(int iter, int size, int threads);
 void *PThreadsRunner(void *param);
 template <typename T>
-void PThreadsSort2_0(T *vec, int l, int r, int &activeThreads, int maxThreads);
+void PThreadsQuickSort2_0(T *vec, int l, int r, int &activeThreads, int maxThreads);
 
 template <typename T>
 void FillArray(T *vec, int s);
@@ -57,7 +60,7 @@ void Output(double time, int s, int threads, char const name[100]);
 template <typename T>
 struct pThreadObj
 {
-    T* vec;
+    T *vec;
     int low;
     int high;
     int &activeThreads;
@@ -76,39 +79,46 @@ int main()
     Output(t, s, 1, "-----------Serial Quicksort v1.5 Metrics-----------");
 
     t = StartSerialQuickSort2_6(3, s);
-    Output(t, s, 1, "-----------Serial Quicksort v1.6 Metrics-----------");
+    Output(t, s, 1, "-----------Serial Quicksort v2.6 Metrics-----------");
 
     for (i = 1; i <= 8; i *= 2)
     {
         t = StartStackQuickSort3_0(3, s, i);
-        Output(t, s, i, "-----------Stack Quicksort v1.0 Metrics-----------");
+        Output(t, s, i, "-----------Stack Quicksort v3.0 Metrics-----------");
     }
 
     for (i = 1; i <= 8; i *= 2)
     {
         t = StartStackQuickSort4_0(3, s, i);
-        Output(t, s, i, "-----------Stack Quicksort v2.0 Metrics-----------");
+        Output(t, s, i, "-----------Stack Quicksort v4.0 Metrics-----------");
     }
 
     for (i = 1; i <= 8; i *= 2)
     {
         t = StartNestedOMPSort2_0(3, s, i);
-        Output(t, s, i,  "-----------Nested OMP Quicksort v1.0 Metrics-----------");
+        Output(t, s, i, "-----------Nested OMP Quicksort v2.0 Metrics-----------");
     }
 
     for (i = 1; i <= 8; i *= 2)
     {
-        t = StartTaskQueueSort2_0(3, s, i);
-        Output(t, s, i,  "-----------Task Queue Quicksort v1.0-----------");
+        t = StartTaskQueueQuickSort2_0(3, s, i);
+        Output(t, s, i, "-----------Task Queue Quicksort v2.0 Metrics-----------");
     }
 
     for (i = 1; i <= 8; i *= 2)
     {
-        t = StartPThreadsSort2_0(3, s, i);
-        Output(t, s, i,  "-----------PThreads Quicksort v1.0-----------");
+        t = StartPThreadsQuickSort2_0(3, s, i);
+        Output(t, s, i, "-----------PThreads Quicksort v2.0 Metrics-----------");
     }
 }
 
+/*
+    Serial Insertion Sort
+    
+    std::vector<T> &vec = Reference to a vector of template T type
+    int low = the low index
+    int high = the high index
+*/
 template <typename T>
 void SerialInsertionSort(std::vector<T> &vec, int low, int high)
 {
@@ -128,6 +138,14 @@ void SerialInsertionSort(std::vector<T> &vec, int low, int high)
         i = i + 1;
     }
 }
+
+/*
+    Serial Insertion Sort
+    
+    T *vec = Pointer to an array of template T type
+    int low = the low index
+    int high = the high index
+*/
 template <typename T>
 void SerialInsertionSort(T *vec, int low, int high)
 {
@@ -148,6 +166,12 @@ void SerialInsertionSort(T *vec, int low, int high)
     }
 }
 
+/*
+    Starter for Serial Quicksort v1_5
+    
+    int iter = number of times to run the algorithm to get an average run time
+    int size = siez of the array
+*/
 double StartSerialQuickSort1_5(int iter, int size)
 {
     double elapsed = 0.0f;
@@ -173,18 +197,27 @@ double StartSerialQuickSort1_5(int iter, int size)
     return elapsed / iter;
 }
 
+/*
+    Serial Quicksort v1.5
+    
+    std::vector<T> = Reference to vector of template T type
+    int low = the low index
+    int high = the high index
+*/
 template <typename T>
 void SerialQuickSort1_5(std::vector<T> &vec, int low, int high)
 {
     T pivot;
     int i, j;
 
+    // if there is not a lot of work left just do a serial insertion sort.
     if (high - low < INSERT_THRESH)
     {
         SerialInsertionSort(vec, low, high);
         return;
     }
 
+    // value to pivot around
     pivot = vec[high];
     i = low - 1;
     j = high;
@@ -205,6 +238,12 @@ void SerialQuickSort1_5(std::vector<T> &vec, int low, int high)
     SerialQuickSort1_5(vec, i + 1, high);
 }
 
+/*
+    Starter for Serial Quicksort v2_6
+    
+    int iter = number of times to run the algorithm to get an average run time
+    int size = siez of the array
+*/
 double StartSerialQuickSort2_6(int iter, int size)
 {
     double elapsed = 0.0f;
@@ -213,7 +252,7 @@ double StartSerialQuickSort2_6(int iter, int size)
     int *vec;
     for (int i = 0; i < iter; i++)
     {
-        // make the array and fil lit
+        // make the array and fill it
         vec = (int *)malloc(size * sizeof(int));
         FillArray(vec, size);
 
@@ -235,6 +274,13 @@ double StartSerialQuickSort2_6(int iter, int size)
     return elapsed / iter;
 }
 
+/*
+    Serial Quicksort v1.5
+    
+    std::vector<T> vec = Reference to vector of template T type
+    int low = the low index
+    int high = the high index
+*/
 template <typename T>
 void SerialQuickSort2_6(T *vec, int low, int high)
 {
@@ -242,12 +288,14 @@ void SerialQuickSort2_6(T *vec, int low, int high)
     T tmp;
     int i, j;
 
+    // if there is not a lot of work left just do a serial insertion sort.
     if (high - low < INSERT_THRESH)
     {
         SerialInsertionSort(vec, low, high);
         return;
     }
 
+    // value to pivot around
     pivot = vec[high];
     i = low - 1;
     j = high;
@@ -270,10 +318,20 @@ void SerialQuickSort2_6(T *vec, int low, int high)
     vec[i] = vec[high];
     vec[high] = tmp;
 
+    // Recursive call
     SerialQuickSort2_6(vec, low, i - 1);
     SerialQuickSort2_6(vec, i + 1, high);
 }
 
+/*
+    Starter for Stack Quicksort v3_0
+    
+    int iter = number of times to run the algorithm to get an average run time
+    int size = size of the array
+    int threads = number of threads to use
+    
+    return double = elapsed average time
+*/
 double StartStackQuickSort3_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
@@ -286,7 +344,9 @@ double StartStackQuickSort3_0(int iter, int size, int threads)
         vec = (int *)malloc(size * sizeof(int));
         FillArray(vec, size);
 
+        // current number of stacks that are pulling from the stack
         int busythreads = 1;
+        // this is the global stack
         std::stack<int> stack;
 
         start = omp_get_wtime();
@@ -294,9 +354,11 @@ double StartStackQuickSort3_0(int iter, int size, int threads)
 #pragma omp parallel num_threads(threads) shared(vec, stack, threads, busythreads)
         {
             if (omp_get_thread_num() == 0)
-                StackQuickSort3_0(vec, 0, size - 1, stack, busythreads, threads);
+                // Need to have the master thread put stuff onto the stack first.
+                StackQuickSort3_0(vec, 0, size - 1, stack, busythreads);
             else
-                StackQuickSort3_0(vec, 0, 0, stack, busythreads, threads);
+                // The other threads will get their low and high from the stack.
+                StackQuickSort3_0(vec, 0, 0, stack, busythreads);
         }
 
         stop = omp_get_wtime();
@@ -313,8 +375,17 @@ double StartStackQuickSort3_0(int iter, int size, int threads)
     return elapsed / iter;
 }
 
+/*
+    Stack Quicksort v3.0
+    
+    T *vec = Pointer to an array of template T type
+    int low = the low index
+    int high = the high index
+    std::stack<int> &stack = a shared stack that stores indices of the array
+    int &busythreads = a shared counter that determines if the stack can be popped off of
+*/
 template <typename T>
-void StackQuickSort3_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads)
+void StackQuickSort3_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads)
 {
     T pivot;
     T tmp;
@@ -401,6 +472,15 @@ void StackQuickSort3_0(T *vec, int low, int high, std::stack<int> &stack, int &b
     } while (true);
 }
 
+/*
+    Starter for Stack Quicksort v3_0
+    
+    int iter = number of times to run the algorithm to get an average run time
+    int size = size of the array
+    int threads = number of threads to use
+    
+    return double = elapsed average time
+*/
 double StartStackQuickSort4_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
@@ -418,12 +498,14 @@ double StartStackQuickSort4_0(int iter, int size, int threads)
 
         start = omp_get_wtime();
 
-#pragma omp parallel num_threads(threads) shared(vec, stack, threads, busythreads)
+#pragma omp parallel num_threads(threads) shared(vec, stack, busythreads)
         {
             if (omp_get_thread_num() == 0)
-                StackQuickSort4_0(vec, 0, size - 1, stack, busythreads, threads);
+            // Need to have the master thread put stuff onto the stack first.
+                StackQuickSort4_0(vec, 0, size - 1, stack, busythreads);
             else
-                StackQuickSort4_0(vec, 0, 0, stack, busythreads, threads);
+                // The other threads will get their low and high from the stack.
+                StackQuickSort4_0(vec, 0, 0, stack, busythreads);
         }
 
         stop = omp_get_wtime();
@@ -440,8 +522,18 @@ double StartStackQuickSort4_0(int iter, int size, int threads)
     return elapsed / iter;
 }
 
+/*
+    Stack Quicksort v4.0
+    
+    T *vec = Pointer to an array of template T type
+    int low = the low index
+    int high = the high index
+    std::stack<int> &stack = a shared stack that stores indices of the array
+    int &busythreads = a shared counter that determines if the stack can be popped off of
+    const int threads = number of threads that can be used.
+*/
 template <typename T>
-void StackQuickSort4_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads, const int threads)
+void StackQuickSort4_0(T *vec, int low, int high, std::stack<int> &stack, int &busythreads)
 {
     T pivot;
     T tmp;
@@ -502,6 +594,7 @@ void StackQuickSort4_0(T *vec, int low, int high, std::stack<int> &stack, int &b
             } // end else
         }     // end while
 
+        // Same as the normal serial quicksort v2.6
         pivot = vec[high];
         i = low - 1;
         j = high;
@@ -521,7 +614,9 @@ void StackQuickSort4_0(T *vec, int low, int high, std::stack<int> &stack, int &b
         tmp = vec[i];
         vec[i] = vec[high];
         vec[high] = tmp;
+        // until here.
 
+        // if there is still work to do that is greater than the threshold
         if (i - 1 - low > INSERT_THRESH)
         {
             if (stack.size() < 16)
@@ -548,6 +643,15 @@ void StackQuickSort4_0(T *vec, int low, int high, std::stack<int> &stack, int &b
     }
 }
 
+/*
+    Starter for Nested OMP Sort v2.0
+    
+    int iter = number of times to run the algorithm to get an average run time
+    int size = size of the array
+    int threads = number of threads to use
+    
+    return double = elapsed average time
+*/
 double StartNestedOMPSort2_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
@@ -579,9 +683,20 @@ double StartNestedOMPSort2_0(int iter, int size, int threads)
     return elapsed / iter;
 }
 
+/*
+    Nested OpenMP Sort with sections
+    
+    T *vec = Pointer to an array of template T type
+    int low = the low index
+    int high = the high index
+    std::stack<int> &stack = a shared stack that stores indices of the array
+    int &busythreads = a shared counter that determines if the stack can be popped off of
+    int &threads = current active threads
+*/
 template <typename T>
 void NestedOMPSort2_0(T *vec, int low, int high, int &busythreads, int &threads)
 {
+    // Regular serial quicksort
     T pivot;
     T tmp;
     int i, j;
@@ -611,7 +726,9 @@ void NestedOMPSort2_0(T *vec, int low, int high, int &busythreads, int &threads)
     tmp = vec[i];
     vec[i] = vec[high];
     vec[high] = tmp;
+    // until here.
 
+    // If there are too many busy threads run pretty much a serial sort until threads are available
     if (busythreads >= threads)
     {
         NestedOMPSort2_0(vec, low, i - 1, busythreads, threads);
@@ -619,6 +736,9 @@ void NestedOMPSort2_0(T *vec, int low, int high, int &busythreads, int &threads)
     }
     else
     {
+        // Create new threaded recursion with threads if there are any available, slightly different from tasks,
+        // instead this is just running parallel code that gets called everytime a thread becomes available.
+        
         busythreads += 2;
 
 #pragma omp parallel num_threads(threads) shared(vec, threads, busythreads, i, low, high)
@@ -644,7 +764,16 @@ void NestedOMPSort2_0(T *vec, int low, int high, int &busythreads, int &threads)
     }
 }
 
-double StartTaskQueueSort2_0(int iter, int size, int threads)
+/*
+    Starter for Task Queue Quicksort v2.0
+    
+    int iter = number of times to run the algorithm to get an average run time
+    int size = size of the array
+    int threads = number of threads to use
+    
+    return double = elapsed average time
+*/
+double StartTaskQueueQuickSort2_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -658,9 +787,10 @@ double StartTaskQueueSort2_0(int iter, int size, int threads)
 
         start = omp_get_wtime();
 
+// Start the task on a task, and make sure 1 thread is used at first
 #pragma omp parallel num_threads(threads) shared(vec)
 #pragma omp single
-        TaskQueueSort2_0(vec, 0, size - 1);
+        TaskQueueQuickSort2_0(vec, 0, size - 1);
 
         stop = omp_get_wtime();
         elapsed += (stop - start);
@@ -676,10 +806,20 @@ double StartTaskQueueSort2_0(int iter, int size, int threads)
     return elapsed / iter;
 }
 
+/*
+    Task Queue Quicksort v2.0
+    
+    T *vec = Pointer to an array of template T type
+    int low = the low index
+    int high = the high index
+    std::stack<int> &stack = a shared stack that stores indices of the array
+    int &busythreads = a shared counter that determines if the stack can be popped off of
+    int &threads = current active threads
+*/
 template <typename T>
-void TaskQueueSort2_0(T *vec, int low, int high)
+void TaskQueueQuickSort2_0(T *vec, int low, int high)
 {
-
+    // Normal serial quicksort
     T pivot;
     T tmp;
     int i, j;
@@ -709,18 +849,29 @@ void TaskQueueSort2_0(T *vec, int low, int high)
     tmp = vec[i];
     vec[i] = vec[high];
     vec[high] = tmp;
+    // Ends here
 
+// Use the openmp task framework to create tasks on a queue
 #pragma omp task shared(vec)
     {
-        TaskQueueSort2_0(vec, low, i - 1);
+        TaskQueueQuickSort2_0(vec, low, i - 1);
     }
 #pragma omp task shared(vec)
     {
-        TaskQueueSort2_0(vec, i + 1, high);
+        TaskQueueQuickSort2_0(vec, i + 1, high);
     }
 }
 
-double StartPThreadsSort2_0(int iter, int size, int threads)
+/*
+    Starter for PThreads Quicksort v2.0
+    
+    int iter = number of times to run the algorithm to get an average run time
+    int size = size of the array
+    int threads = number of threads to use
+    
+    return double = elapsed average time
+*/
+double StartPThreadsQuickSort2_0(int iter, int size, int threads)
 {
     double elapsed = 0.0f;
     double start = 0.0f;
@@ -731,12 +882,12 @@ double StartPThreadsSort2_0(int iter, int size, int threads)
         // make the array and fill it
         vec = (int *)malloc(size * sizeof(int));
         FillArray(vec, size);
-        
+
         int activeThreads = 1;
 
         start = omp_get_wtime();
 
-        PThreadsSort2_0(vec, 0, size - 1, activeThreads, threads);
+        PThreadsQuickSort2_0(vec, 0, size - 1, activeThreads, threads);
 
         stop = omp_get_wtime();
         elapsed += (stop - start);
@@ -752,18 +903,32 @@ double StartPThreadsSort2_0(int iter, int size, int threads)
     return elapsed / iter;
 }
 
+/*
+    This starts the PThread Quicksort for threads.
+    void *param = a void type that is typed casted into a defined struct
+*/
 void *PThreadsRunner(void *param)
 {
     struct pThreadObj<int> p = *(static_cast<pThreadObj<int> *>(param));
     p.activeThreads++;
 
-    PThreadsSort2_0(p.vec, p.low, p.high, p.activeThreads, p.maxThreads);
+    PThreadsQuickSort2_0(p.vec, p.low, p.high, p.activeThreads, p.maxThreads);
     return NULL;
 }
 
+/*
+    PThreads Quicksort v2.0
+    
+    T *vec = Pointer to an array of template T type
+    int low = the low index
+    int high = the high index
+    int &activeThreads = number of threads that are currently active
+    int const maxThreads = total number of threads that can be active at a time
+*/
 template <typename T>
-void PThreadsSort2_0(T *vec, int low, int high, int &activeThreads, int const maxThreads)
+void PThreadsQuickSort2_0(T *vec, int low, int high, int &activeThreads, int const maxThreads)
 {
+    // Normal serial quicksort 
     T pivot;
     T tmp;
     int i, j;
@@ -793,9 +958,12 @@ void PThreadsSort2_0(T *vec, int low, int high, int &activeThreads, int const ma
     tmp = vec[i];
     vec[i] = vec[high];
     vec[high] = tmp;
+    // end serial quicksort
 
+    // If there are threads available assignment
     if (activeThreads < maxThreads)
     {
+        // make a thread and struct parameter
         pthread_t thread;
         struct pThreadObj<int> p =
         {
@@ -804,27 +972,40 @@ void PThreadsSort2_0(T *vec, int low, int high, int &activeThreads, int const ma
 
         // create a new thread and process it.
         pthread_create(&thread, NULL, PThreadsRunner, &p);
-        PThreadsSort2_0(vec, i + 1, high, activeThreads, maxThreads);
+        PThreadsQuickSort2_0(vec, i + 1, high, activeThreads, maxThreads);
 
+        // once the thread comes back out from its recursion join it into the other threads
         pthread_join(thread, NULL);
         activeThreads--;
     }
     else
     {
         // all threads are busy, do a serial sort instead
-        PThreadsSort2_0(vec, low, i - 1, activeThreads, maxThreads);
-        PThreadsSort2_0(vec, i + 1, high, activeThreads, maxThreads);
+        PThreadsQuickSort2_0(vec, low, i - 1, activeThreads, maxThreads);
+        PThreadsQuickSort2_0(vec, i + 1, high, activeThreads, maxThreads);
     }
 }
 
+/*
+    Fills an array given the array and size
+    
+    T* vec = Reference to an array
+    int s = size of the array
+*/
 template <typename T>
 void FillArray(T *vec, int s)
 {
+    // set a seed so the same array is always used.
     srand(777);
     for (int i = 0; i < s; i++)
         vec[i] = rand();
 }
 
+/*
+    Checks the vector to make sure it is actually sorted
+    
+    std::vector<T> &vec = reference to the vector that should be sorted
+*/
 template <typename T>
 bool Validate(std::vector<T> &vec)
 {
@@ -840,6 +1021,11 @@ bool Validate(std::vector<T> &vec)
     return isSorted;
 }
 
+/*
+    Checks the array to make sure it is actually sorted
+    
+    T *vec = reference to the array that should be sorted
+*/
 template <typename T>
 bool Validate(T *vec, int s)
 {
@@ -854,6 +1040,14 @@ bool Validate(T *vec, int s)
     return isSorted;
 }
 
+/*
+    Output the relevant data from the sorts
+    
+    double time = time taken to sort the array
+    int s = size of the array
+    int threads = threads used
+    char const name[100] = The name of the function
+*/
 void Output(double time, int s, int threads, char const name[100])
 {
 
